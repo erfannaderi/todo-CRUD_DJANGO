@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, ListView
 from .models import Task
 
@@ -8,16 +8,41 @@ from .models import Task
 class HomeView(ListView):
     template_name = 'home.html'
     model = Task
-    task = Task.objects.filter(is_complete=False).order_by('-updated_at')
 
+    # task = Task.objects.filter(is_complete=False)
+    # completed_tasks = Task.objects.filter(is_complete=True)
 
-def addTask(request):
-    task = request.POST['task']
-    Task.objects.create(task=task)
-    return redirect('home')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tasks'] = Task.objects.filter(is_complete=False).order_by('-updated_at')
+        context['completed_tasks'] = Task.objects.filter(is_complete=True)
+        return context
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     tasks = Task.objects.all()  # Retrieve tasks from the database
-    #     context['tasks'] = tasks  # Add tasks to the context
-    #     return context
+    def addTask(request):
+        task = request.POST['task']
+        Task.objects.create(task=task)
+        return redirect('home')
+
+    def mark_as_done(request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        task.is_complete = True
+        task.save()
+        return redirect('home')
+
+    def mark_as_undone(request, pk):
+        task = get_object_or_404(Task, pk=pk)
+        task.is_complete = False;
+        task.save()
+        return redirect('home')
+
+    def edit_task(request, pk):
+        get_task = get_object_or_404(Task, pk=pk)
+        if request.method == 'POST':
+            new_task = get_task
+        else:
+            context = {'get_task': get_task}
+            return render(request, 'edit_task.html', )
+
+    def delete_task(request, pk):
+        task = get_object_or_404(Task, pk)
+        return redirect('home')
