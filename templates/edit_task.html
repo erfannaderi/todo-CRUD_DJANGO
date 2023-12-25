@@ -22,15 +22,13 @@
     <h3 class="pt-5 pb-5 text-center">Django to do app -edit</h3>
 </div>
 
-<form action="{% url 'edit_task' get_task.pk %}" method="POST" style="width: 500px; margin: auto;">
+<form action="{% url 'edit_task' task.pk %}" method="POST" style="width: 500px; margin: auto;">
     {% csrf_token %}
     <div class="form-group">
-                        <span style="display: flex;">
-                            <input name="task" type="text" class="form-control" placeholder="Add a task"
-                                   value="{{ get_task.task }}">
-                            <button type="submit" class="btn btn-primary" style="width: 200px;"><i
-                                    class="fa fa-plus"></i> Update</button>
-                        </span>
+        <span style="display: flex;">
+            <input name="task" type="text" class="form-control" placeholder="Edit the task" value="{{ task.task }}">
+            <button type="submit" class="btn btn-primary" style="width: 200px;"><i class="fa fa-pencil"></i> Update</button>
+        </span>
     </div>
 </form>
 </body>
